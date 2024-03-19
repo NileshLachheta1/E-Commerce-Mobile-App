@@ -6,12 +6,12 @@ import {
   Pressable,
   TextInput,
 } from 'react-native';
-import React, {useContext, useEffect, useState} from 'react';
+import React, {useCallback, useContext, useEffect, useState} from 'react';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import Feather from 'react-native-vector-icons/Feather';
 import Entypo from 'react-native-vector-icons/Entypo';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import {useNavigation} from '@react-navigation/native';
+import {useFocusEffect, useNavigation} from '@react-navigation/native';
 import axios from 'axios';
 import {UserType} from '../UserContext';
 const AddAddressScreen = () => {
@@ -27,7 +27,7 @@ const AddAddressScreen = () => {
   const fetchAddresses = async () => {
     try {
       const response = await axios.get(
-        `http://192.168.1.14:8000/addresses/65f7e36e92127dee17308a7d`,
+        `http://192.168.1.31:8000/addresses/65f7e36e92127dee17308a7d`,
       );
       const addresses = response.data.addresses;
       setAddresses(addresses);
@@ -35,7 +35,14 @@ const AddAddressScreen = () => {
       console.log(error);
     }
   };
-  console.log('addresses', addresses);
+
+  // Refresh the addresses when the component comes into the focus i.e. when we navigate back after adding address
+  useFocusEffect(
+    useCallback(()=> {
+      fetchAddresses();
+    },[])
+  )
+  // console.log('addresses', addresses);
   return (
     <ScrollView showsVerticalScrollIndicator={false} style={{marginTop: 50}}>
       <View

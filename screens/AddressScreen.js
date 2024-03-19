@@ -51,7 +51,7 @@ const AddressScreen = () => {
         landmark,
         postalCode
     }
-    axios.post("http://192.168.1.14:8000/address",{userId,address}).then(()=>{
+    axios.post("http://192.168.1.31:8000/address",{userId,address}).then(()=>{
         Alert.alert("Success","Address Added Successfully");
         setName("");
         setMobileNo("");

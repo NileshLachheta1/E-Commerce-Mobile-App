@@ -11,7 +11,12 @@ import React from 'react';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import Feather from 'react-native-vector-icons/Feather';
 import {useDispatch, useSelector} from 'react-redux';
-import { incrementQuantity } from '../redux/CartReducer';
+import {
+  decrementQuantity,
+  incrementQuantity,
+  removeFromCart,
+} from '../redux/CartReducer';
+import {useNavigation} from '@react-navigation/native';
 
 const CartScreen = () => {
   const cart = useSelector(state => state.cart.cart);
@@ -20,10 +25,20 @@ const CartScreen = () => {
     .map(item => item.price * item.quantity)
     .reduce((curr, prev) => curr + prev, 0);
 
-    const dispatch = useDispatch();
-    const increaseQuantity = (item)=>{
-        dispatch(incrementQuantity(item));
-    }
+  const dispatch = useDispatch();
+  const increaseQuantity = item => {
+    dispatch(incrementQuantity(item));
+  };
+
+  const decreaseQuantity = item => {
+    dispatch(decrementQuantity(item));
+  };
+
+  const deleteItem = item => {
+    dispatch(removeFromCart(item));
+  };
+
+  const navigation = useNavigation();
   console.log('total : ', total);
   return (
     <ScrollView style={{marginTop: 55, flex: 1, backgroundColor: 'white'}}>
@@ -66,6 +81,9 @@ const CartScreen = () => {
       </View>
       <Text style={{marginHorizontal: 10}}>EMI Details Available</Text>
       <Pressable
+        onPress={() => {
+          navigation.navigate('Confirm');
+        }}
         style={{
           backgroundColor: '#FFC72C',
           padding: 10,
@@ -149,26 +167,46 @@ const CartScreen = () => {
                     paddingVertical: 5,
                     borderRadius: 7,
                   }}>
-                  <Pressable
-                    style={{
-                      backgroundColor: '#D8D8D8',
-                      padding: 7,
-                      borderTopLeftRadius: 6,
-                      borderBottomLeftRadius: 6,
-                    }}>
-                    <AntDesign name="delete" size={24} color="#000000" />
-                  </Pressable>
+                  {item.quantity > 1 ? (
+                    <Pressable
+                      onPress={() => {
+                        decreaseQuantity(item);
+                      }}
+                      style={{
+                        backgroundColor: '#D8D8D8',
+                        padding: 7,
+                        borderTopLeftRadius: 6,
+                        borderBottomLeftRadius: 6,
+                      }}>
+                      <AntDesign name="minus" size={24} color="#000000" />
+                    </Pressable>
+                  ) : (
+                    <Pressable
+                      onPress={() => {
+                        deleteItem(item);
+                      }}
+                      style={{
+                        backgroundColor: '#D8D8D8',
+                        padding: 7,
+                        borderTopLeftRadius: 6,
+                        borderBottomLeftRadius: 6,
+                      }}>
+                      <AntDesign name="delete" size={24} color="#000000" />
+                    </Pressable>
+                  )}
                   <Pressable
                     style={{
                       backgroundColor: 'white',
                       paddingHorizontal: 18,
                       paddingVertical: 6,
                     }}>
-                    <Text>{item.quantity}</Text>
+                    <Text style={{color: 'black'}}>{item.quantity}</Text>
                   </Pressable>
 
                   <Pressable
-                  onPress={()=>{increaseQuantity(item)}}
+                    onPress={() => {
+                      increaseQuantity(item);
+                    }}
                     style={{
                       backgroundColor: '#D8D8D8',
                       padding: 7,
@@ -179,15 +217,18 @@ const CartScreen = () => {
                   </Pressable>
                 </View>
                 <Pressable
+                  onPress={() => {
+                    deleteItem(item);
+                  }}
                   style={{
                     backgroundColor: 'white',
                     paddingHorizontal: 8,
-                    paddingVertical: 10,
+                    paddingVertical: 12,
                     borderRadius: 5,
                     borderColor: '#C0C0C0',
                     borderWidth: 0.6,
                   }}>
-                  <Text>Delete</Text>
+                  <Text style={{color: 'black'}}>Delete</Text>
                 </Pressable>
               </Pressable>
 
@@ -207,7 +248,7 @@ const CartScreen = () => {
                     borderColor: '#C0C0C0',
                     borderWidth: 0.6,
                   }}>
-                  <Text>Save For Later</Text>
+                  <Text style={{color: 'black'}}>Save For Later</Text>
                 </Pressable>
 
                 <Pressable
@@ -219,7 +260,7 @@ const CartScreen = () => {
                     borderColor: '#C0C0C0',
                     borderWidth: 0.6,
                   }}>
-                  <Text>See More Like this</Text>
+                  <Text style={{color: 'black'}}>See More Like this</Text>
                 </Pressable>
               </Pressable>
             </View>
