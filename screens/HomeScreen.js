@@ -11,7 +11,6 @@ import {
   Image,
   ViewPropTypes,
   TouchableOpacity,
-  // Modal
 } from 'react-native';
 import React, {useCallback, useEffect, useState, useContext} from 'react';
 import AntDesign from 'react-native-vector-icons/AntDesign';
@@ -229,6 +228,7 @@ export const HomeScreen = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [addresses, setAddresses] = useState([]);
   const {userId, setUserId} = useContext(UserType);
+  const [selectedAddress,setSelectedAddress] = useState("");
   setUserId('65f7e36e92127dee17308a7d');
   useEffect(() => {
     if (userId) {
@@ -244,10 +244,10 @@ export const HomeScreen = () => {
       const addresses = response.data.addresses;
       setAddresses(addresses);
     } catch (error) {
-      console.log("---------------------",error);
+      console.log('---------------------', error);
     }
   };
-  console.log('Addresses : ', addresses);
+  // console.log('Addresses ------------ : ', addresses);
   return (
     <>
       <SafeAreaView
@@ -291,7 +291,10 @@ export const HomeScreen = () => {
             />
           </View>
 
-          <View
+          <Pressable
+          onPress={() => {
+            setModalVisible(true);
+          }}
             style={{
               flexDirection: 'row',
               alignItems: 'center',
@@ -306,20 +309,21 @@ export const HomeScreen = () => {
               color="#000000"
             />
 
-            <Pressable
-              onPress={() => {
-                setModalVisible(true);
-              }}>
-              <Text style={{color: 'black', fontSize: 13, fontWeight: '500'}}>
-                Deliver to Vijay Nagar - Indore 452016
-              </Text>
+            <Pressable>
+              {selectedAddress?(
+                <Text style={{color:"black", fontSize:13, fontWeight:"500"}}>
+                  Deliver to {selectedAddress.name} - {selectedAddress.street}
+                </Text>
+              ):(
+                <Text style={{color:"black", fontSize:13, fontWeight:"500"}}>Add an Address</Text>
+              )}
             </Pressable>
             <MaterialIcons
               name="keyboard-arrow-down"
               size={24}
               color="#000000"
             />
-          </View>
+          </Pressable>
           <ScrollView horizontal showsHorizontalScrollIndicator={false}>
             {list.map((item, index) => {
               return (
@@ -564,31 +568,50 @@ export const HomeScreen = () => {
           <ScrollView horizontal showsHorizontalScrollIndicator={false}>
             {/* already added address */}
             {addresses.map((item, index) => {
-              <Pressable
-                style={{
-                  width: 140,
-                  height: 140,
-                  borderColor: '#D0D0D0',
-                  borderWidth: 1,
-                  padding: 10,
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  gap: 3,
-                  marginBottom: 15,
-                }}>
-                <View
-                  style={{flexDirection: 'row', alignItems: 'center', gap: 3}}>
-                  <Text style={{fontSize: 15, fontWeight: 'bold'}}>
-                    {item.name}
+              return (
+                <Pressable
+                onPress={()=>{setSelectedAddress(item)}}
+                  style={{
+                    width: 140,
+                    height: 140,
+                    borderColor: '#D0D0D0',
+                    borderWidth: 1,
+                    padding: 15,
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    gap: 3,
+                    marginTop: 10,
+                    margin: 5,
+                    backgroundColor:selectedAddress === item ? "#FBCEB1" : "white"
+                  }}>
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      gap: 2,
+                    }}>
+                    <Text style={{fontSize: 13, fontWeight: 'bold'}}>
+                      {item.name}
+                    </Text>
+                    <Entypo name="location-pin" size={24} color="red" />
+                  </View>
+                  <Text
+                    numberOfLines={1}
+                    style={{width: 130, fontSize: 13, textAlign: 'center'}}>
+                    {item.houseNo},{item.landmark}
                   </Text>
-                  <Entypo
-                    style={{paddingLeft: 10}}
-                    name="location-pin"
-                    size={24}
-                    color="red"
-                  />
-                </View>
-              </Pressable>;
+                  <Text
+                    numberOfLines={1}
+                    style={{width: 130, fontSize: 13, textAlign: 'center'}}>
+                    {item.street}
+                  </Text>
+                  <Text
+                    numberOfLines={1}
+                    style={{width: 130, fontSize: 13, textAlign: 'center'}}>
+                    India,Banglore-{item.postalCode}
+                  </Text>
+                </Pressable>
+              );
             })}
             <Pressable
               onPress={() => {
