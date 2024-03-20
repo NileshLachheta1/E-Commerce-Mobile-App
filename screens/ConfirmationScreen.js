@@ -4,7 +4,9 @@ import axios from 'axios';
 import Entypo from 'react-native-vector-icons/Entypo';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import {UseSelector} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
+import {useNavigation} from '@react-navigation/native';
+import {cleanCart} from '../redux/CartReducer';
 
 const ConfirmationScreen = () => {
   const steps = [
@@ -29,7 +31,7 @@ const ConfirmationScreen = () => {
   const fetchAddresses = async () => {
     try {
       const response = await axios.get(
-        `http://192.168.1.31:8000/addresses/65f7e36e92127dee17308a7d`,
+        `http://192.168.1.11:8000/addresses/65f7e36e92127dee17308a7d`,
       );
       const addresses = response.data.addresses;
       setAddresses(addresses);
@@ -40,6 +42,34 @@ const ConfirmationScreen = () => {
   const [selectedAddress, setSelectedAddress] = useState('');
   const [options, setOptions] = useState(false);
   const [selectedOptions, setSelectedOptions] = useState('');
+  const navigation = useNavigation();
+  const dispatch = useDispatch();
+  const handlePlaceOrder = async () => {
+    try {
+      const orderData = {
+        userId: "65f7e36e92127dee17308a7d",
+        cartItems: cart,
+        totalPrice: total,
+        shippingAddress: selectedAddress,
+        paymentMethod: selectedOptions,
+      };
+
+      const response = await axios.post(
+        'http://192.168.1.11:8000/orders',
+        orderData,
+      );
+      if (response.status == 200) {
+        navigation.navigate('Order');
+        dispatch(cleanCart());
+        console.log('Order Created Successfully', response.data.order);
+      } else {
+        console.log('error creating order', response.data);
+      }
+    } catch (error) {
+      console.log('Error : ', error);
+    }
+  };
+
   return (
     <ScrollView style={{marginTop: 55}}>
       <View style={{flex: 1, paddingHorizontal: 20, paddingTop: 40}}>
@@ -463,6 +493,9 @@ const ConfirmationScreen = () => {
           </View>
 
           <Pressable
+            onPress={() => {
+              handlePlaceOrder();
+            }}
             style={{
               backgroundColor: '#FFC72C',
               padding: 10,
@@ -482,3 +515,5 @@ const ConfirmationScreen = () => {
 export default ConfirmationScreen;
 
 const styles = StyleSheet.create({});
+
+// 06:04:00

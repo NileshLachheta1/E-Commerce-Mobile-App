@@ -191,3 +191,74 @@ app.get("/addresses/:userId", async(request,response)=>{
     response.status(500).json({message : "error retriving the addresses"})
   }
 })
+
+
+// endpoint to store all the orders
+app.post("/orders", async(request,response)=>{
+  try {
+    const {userId, cartItems, totalPrice, shippingAddress, paymentMethod} = request.body;
+    const user = await User.findById(userId);
+
+    if(!user){
+      return response.status(404).json({message:"User not found"});
+    }
+
+    // create an array of products objects from the cart items
+    const products = cartItems.map((item,index)=>({
+      name : item.title, 
+      quantity : item.quantity,
+      price : item.price,
+      image : item.image,
+
+    }))
+
+    // create a new order
+
+    const order = new Order({
+      user : userId,
+      products : products,
+      totalPrice : totalPrice,
+      shippingAddress : shippingAddress,
+      paymentMethod : paymentMethod
+    })
+
+    await order.save();
+
+    response.status(200).json({message : "Order Create Successfully."})
+  } catch (error) {
+    console.log("Error creating orders",error);
+    response.status(500).json({message:"Error Creating Orders"})
+  }
+})
+
+// get the user Profile
+app.get("/profile/:userId", async(request,response) =>{
+  try {
+    const userId = request.params.userId;
+
+    const user = await User.findById(userId);
+
+    if(!user){
+      return response.status(404).json({message : "User not found"})
+    }
+    response.status(200).json({user});
+  } catch (error) {
+    response.status(500).json({message:"Error Retriving the User Profile"}) 
+  }
+})
+
+
+app.get("/orders/:userId", async (request,response)=>{
+  try {
+    const userId = request.params.userId;
+
+    const orders = await Order.find({user : userId}).populate("user");
+    if(!orders || orders.length == 0){
+      return response.status(404).json({message : "No Orders found for this user "})
+    }
+
+    response.status(200).json({orders})
+  } catch (error) {
+    response.status(500).json({message:"Error"})
+  }
+})

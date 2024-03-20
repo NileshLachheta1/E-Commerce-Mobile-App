@@ -30,7 +30,7 @@ const RegisterScreen = () => {
     // send a post request to the backend api
 
     axios
-      .post('http://192.168.1.31:8000/register', user)
+      .post('http://192.168.1.11:8000/register', user)
       .then(response => {
         console.log(response);
         Alert.alert(
