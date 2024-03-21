@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-
+import connection from "../db/connection.js";
 const userSchema = new mongoose.Schema({
     name : {
         type: String,
@@ -29,7 +29,7 @@ const userSchema = new mongoose.Schema({
             city : String,
             country : String,
             postalCode : String,
-            
+ 
         }
     ],
     orders : [

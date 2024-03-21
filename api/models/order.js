@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-
+import connection from '../db/connection.js';
 const orderSchema = new mongoose.Schema({
   user: {
     type: mongoose.Schema.Types.ObjectId,

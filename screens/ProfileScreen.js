@@ -49,7 +49,7 @@ const ProfileScreen = () => {
     const fetchUserProfile = async () => {
       try {
         const response = await axios.get(
-          'http://192.168.1.11:8000/profile/65f7e36e92127dee17308a7d',
+          'http://192.168.1.16:8000/user/profile/65f7e36e92127dee17308a7d',
         );
         const {user} = response.data;
         setUser(user);
@@ -71,7 +71,7 @@ const ProfileScreen = () => {
   useEffect(()=>{
     const fetchOrders = async()=>{
       try {
-        const response = await axios.get("http://192.168.1.11:8000/orders/65f7e36e92127dee17308a7d");
+        const response = await axios.get("http://192.168.1.16:8000/user/orders/65f7e36e92127dee17308a7d");
         const order = response.data.orders;
         setOrders(order);
 
@@ -103,7 +103,7 @@ const ProfileScreen = () => {
             borderRadius: 25,
             flex: 1,
           }}>
-          <Text style={{textAlign: 'center'}}>Your Orders</Text>
+          <Text style={{textAlign: 'center', color:"black",fontWeight:"500"}}>Your Orders</Text>
         </Pressable>
 
         <Pressable
@@ -113,7 +113,7 @@ const ProfileScreen = () => {
             borderRadius: 25,
             flex: 1,
           }}>
-          <Text style={{textAlign: 'center'}}>Your Account</Text>
+          <Text style={{textAlign: 'center', color:"black",fontWeight:"500"}}>Your Account</Text>
         </Pressable>
       </View>
 
@@ -131,7 +131,7 @@ const ProfileScreen = () => {
             borderRadius: 25,
             flex: 1,
           }}>
-          <Text style={{textAlign: 'center'}}>Buy Again</Text>
+          <Text style={{textAlign: 'center', color:"black",fontWeight:"500"}}>Buy Again</Text>
         </Pressable>
 
         <Pressable
@@ -142,13 +142,13 @@ const ProfileScreen = () => {
             borderRadius: 25,
             flex: 1,
           }}>
-          <Text style={{textAlign: 'center'}}>Logout</Text>
+          <Text style={{textAlign: 'center', color:"black",fontWeight:"500"}}>Logout</Text>
         </Pressable>
       </View>
 
       <ScrollView horizontal showsHorizontalScrollIndicator={false}>
         {loading ? (
-          <Text>Loading...</Text>
+          <Text style={{fontSize: 16, fontWeight: '500', color:"black", marginVertical:10}}>Loading...</Text>
         ) : orders.length > 0 ? (
           orders.map((order) => (
             <Pressable

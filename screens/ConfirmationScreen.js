@@ -20,7 +20,7 @@ const ConfirmationScreen = () => {
   const [currentStep, setCurrentStep] = useState(0);
   const [addresses, setAddresses] = useState([]);
   const cart = useSelector(state => state.cart.cart);
-  console.log('Cart -->   ', cart);
+  // console.log('Cart -->   ', cart);
   const total = cart
     .map(item => item.price * item.quantity)
     .reduce((curr, prev) => curr + prev, 0);
@@ -32,7 +32,7 @@ const ConfirmationScreen = () => {
   const fetchAddresses = async () => {
     try {
       const response = await axios.get(
-        `http://192.168.1.11:8000/addresses/65f7e36e92127dee17308a7d`,
+        `http://192.168.1.16:8000/user/addresses/65f7e36e92127dee17308a7d`,
       );
       const addresses = response.data.addresses;
       setAddresses(addresses);
@@ -56,13 +56,13 @@ const ConfirmationScreen = () => {
       };
 
       const response = await axios.post(
-        'http://192.168.1.11:8000/orders',
+        'http://192.168.1.16:8000/user/orders',
         orderData,
       );
       if (response.status == 200) {
         navigation.navigate('Order');
         dispatch(cleanCart());
-        console.log('Order Created Successfully', response.data.order);
+        console.log('Order Created Successfully');
       } else {
         console.log('error creating order', response.data);
       }
@@ -70,6 +70,8 @@ const ConfirmationScreen = () => {
       console.log('Error : ', error);
     }
   };
+
+  console.log("address :  ",selectedAddress)
 
   const pay = async () => {
     try {
@@ -88,7 +90,7 @@ const ConfirmationScreen = () => {
       };
       const data = await RazorpayCheckout.open(options);
 
-      console.log("Data : ",data)
+      // console.log("Data : ",data)
       const orderData = {
         userId: '65f7e36e92127dee17308a7d',
         cartItems: cart,
@@ -98,7 +100,7 @@ const ConfirmationScreen = () => {
       };
 
       const response = await axios.post(
-        'http://192.168.1.11:8000/orders',
+        'http://192.168.1.16:8000/user/orders',
         orderData,
       );
       if (response.status === 200) {

@@ -76,25 +76,27 @@ const CartScreen = () => {
         />
       </View>
       <View style={{padding: 10, flexDirection: 'row', alignItems: 'center'}}>
-        <Text style={{fontSize: 18, fontWeight: '400'}}>Subtotal : </Text>
-        <Text style={{fontSize: 20, fontWeight: 'bold'}}>{total}</Text>
+        <Text style={{fontSize: 18, fontWeight: '400', color:"black"}}>Subtotal : </Text>
+        <Text style={{fontSize: 20, fontWeight: 'bold', color:"black"}}>{total}</Text>
       </View>
-      <Text style={{marginHorizontal: 10}}>EMI Details Available</Text>
-      <Pressable
-        onPress={() => {
-          navigation.navigate('Confirm');
-        }}
-        style={{
-          backgroundColor: '#FFC72C',
-          padding: 10,
-          borderRadius: 5,
-          justifyContent: 'center',
-          alignItems: 'center',
-          marginHorizontal: 10,
-          marginTop: 10,
-        }}>
-        <Text>Proceed to Buy ({cart.length}) items</Text>
-      </Pressable>
+      <Text style={{marginHorizontal: 10, color:"black"}}>EMI Details Available</Text>
+      {cart.length > 0 && (
+        <Pressable
+          onPress={() => {
+            navigation.navigate('Confirm');
+          }}
+          style={{
+            backgroundColor: '#FFC72C',
+            padding: 10,
+            borderRadius: 5,
+            justifyContent: 'center',
+            alignItems: 'center',
+            marginHorizontal: 10,
+            marginTop: 10,
+          }}>
+          <Text  style={{fontSize: 16, fontWeight: '500', color:"black"}}>Proceed to Buy ({cart.length}) items</Text>
+        </Pressable>
+      )}
 
       <Text
         style={{
@@ -247,6 +249,7 @@ const CartScreen = () => {
                     borderRadius: 5,
                     borderColor: '#C0C0C0',
                     borderWidth: 0.6,
+
                   }}>
                   <Text style={{color: 'black'}}>Save For Later</Text>
                 </Pressable>
