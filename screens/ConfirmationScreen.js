@@ -1,4 +1,4 @@
-import {StyleSheet, Text, View, ScrollView, Pressable} from 'react-native';
+import {StyleSheet, Text, View, ScrollView, Pressable, Alert} from 'react-native';
 import React, {useState, useEffect} from 'react';
 import axios from 'axios';
 import Entypo from 'react-native-vector-icons/Entypo';
@@ -7,6 +7,7 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {useDispatch, useSelector} from 'react-redux';
 import {useNavigation} from '@react-navigation/native';
 import {cleanCart} from '../redux/CartReducer';
+import RazorpayCheckout from 'react-native-razorpay';
 
 const ConfirmationScreen = () => {
   const steps = [
@@ -47,7 +48,7 @@ const ConfirmationScreen = () => {
   const handlePlaceOrder = async () => {
     try {
       const orderData = {
-        userId: "65f7e36e92127dee17308a7d",
+        userId: '65f7e36e92127dee17308a7d',
         cartItems: cart,
         totalPrice: total,
         shippingAddress: selectedAddress,
@@ -59,6 +60,48 @@ const ConfirmationScreen = () => {
         orderData,
       );
       if (response.status == 200) {
+        navigation.navigate('Order');
+        dispatch(cleanCart());
+        console.log('Order Created Successfully', response.data.order);
+      } else {
+        console.log('error creating order', response.data);
+      }
+    } catch (error) {
+      console.log('Error : ', error);
+    }
+  };
+
+  const pay = async () => {
+    try {
+      const options = {
+        description: 'Adding to Wallet',
+        currency: 'INR',
+        name: 'Amazon',
+        key: 'rzp_test_E3GWYimxN7YMk8',
+        amount: total * 100,
+        prefill: {
+          email: 'void@razorpay.com',
+          contact: '9191919191',
+          name: 'RazorPay Software',
+        },
+        theme: {color: '#F37254'},
+      };
+      const data = await RazorpayCheckout.open(options);
+
+      console.log("Data : ",data)
+      const orderData = {
+        userId: '65f7e36e92127dee17308a7d',
+        cartItems: cart,
+        totalPrice: total,
+        shippingAddress: selectedAddress,
+        paymentMethod: "card",
+      };
+
+      const response = await axios.post(
+        'http://192.168.1.11:8000/orders',
+        orderData,
+      );
+      if (response.status === 200) {
         navigation.navigate('Order');
         dispatch(cleanCart());
         console.log('Order Created Successfully', response.data.order);
@@ -370,6 +413,16 @@ const ConfirmationScreen = () => {
               <Entypo
                 onPress={() => {
                   setSelectedOptions('card');
+                  Alert.alert("UPI/Debit card", "Pay Online", [
+                    {
+                      text: "Cancel",
+                      onPress: () => console.log("Cancel is pressed"),
+                    },
+                    {
+                      text: "OK",
+                      onPress: () => pay(),
+                    },
+                  ]);
                 }}
                 name="circle"
                 size={20}
@@ -515,5 +568,3 @@ const ConfirmationScreen = () => {
 export default ConfirmationScreen;
 
 const styles = StyleSheet.create({});
-
-// 06:04:00
