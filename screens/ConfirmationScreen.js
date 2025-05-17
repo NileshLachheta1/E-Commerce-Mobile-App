@@ -8,6 +8,8 @@ import {useDispatch, useSelector} from 'react-redux';
 import {useNavigation} from '@react-navigation/native';
 import {cleanCart} from '../redux/CartReducer';
 import RazorpayCheckout from 'react-native-razorpay';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { URLS } from '../utils/urls';
 
 const ConfirmationScreen = () => {
   const steps = [
@@ -20,26 +22,35 @@ const ConfirmationScreen = () => {
   const [currentStep, setCurrentStep] = useState(0);
   const [addresses, setAddresses] = useState([]);
   const cart = useSelector(state => state.cart.cart);
+  const [token,setToken] = useState('');
   // console.log('Cart -->   ', cart);
   const total = cart
     .map(item => item.price * item.quantity)
     .reduce((curr, prev) => curr + prev, 0);
 
   useEffect(() => {
-    fetchAddresses();
+    const getTokenData = async ()=>{
+      const tokendata = await AsyncStorage.getItem('authToken');
+      // console.log("order token : ",tokendata)
+      setToken(tokendata);
+      try {
+        console.log(tokendata)
+        const response = await axios.get(
+          `${URLS.BASE_URL}user/addresses/${tokendata}`,
+        );
+        // console.log("addresses : ",response)
+        const addresses = response.data.addresses;
+        setAddresses(addresses);
+      } catch (error) {
+        console.log("Error On Fetch Address",error);
+      }
+    }
+
+    getTokenData();
+    // console.log("order palce ")
   }, []);
 
-  const fetchAddresses = async () => {
-    try {
-      const response = await axios.get(
-        `http://192.168.1.16:8000/user/addresses/65f7e36e92127dee17308a7d`,
-      );
-      const addresses = response.data.addresses;
-      setAddresses(addresses);
-    } catch (error) {
-      console.log(error);
-    }
-  };
+
   const [selectedAddress, setSelectedAddress] = useState('');
   const [options, setOptions] = useState(false);
   const [selectedOptions, setSelectedOptions] = useState('');
@@ -47,8 +58,9 @@ const ConfirmationScreen = () => {
   const dispatch = useDispatch();
   const handlePlaceOrder = async () => {
     try {
+      console.log("token ----> : ",token)
       const orderData = {
-        userId: '65f7e36e92127dee17308a7d',
+        userId: token,
         cartItems: cart,
         totalPrice: total,
         shippingAddress: selectedAddress,
@@ -56,7 +68,7 @@ const ConfirmationScreen = () => {
       };
 
       const response = await axios.post(
-        'http://192.168.1.16:8000/user/orders',
+        `${URLS.BASE_URL}user/orders`,
         orderData,
       );
       if (response.status == 200) {
@@ -67,11 +79,11 @@ const ConfirmationScreen = () => {
         console.log('error creating order', response.data);
       }
     } catch (error) {
-      console.log('Error : ', error);
+      console.log('Error in handle Place Order : ', error);
     }
   };
 
-  console.log("address :  ",selectedAddress)
+  // console.log("address :  ",selectedAddress)
 
   const pay = async () => {
     try {
@@ -92,7 +104,7 @@ const ConfirmationScreen = () => {
 
       // console.log("Data : ",data)
       const orderData = {
-        userId: '65f7e36e92127dee17308a7d',
+        userId: token,
         cartItems: cart,
         totalPrice: total,
         shippingAddress: selectedAddress,
@@ -100,7 +112,7 @@ const ConfirmationScreen = () => {
       };
 
       const response = await axios.post(
-        'http://192.168.1.16:8000/user/orders',
+        `${URLS.BASE_URL}user/orders`,
         orderData,
       );
       if (response.status === 200) {
@@ -111,7 +123,7 @@ const ConfirmationScreen = () => {
         console.log('error creating order', response.data);
       }
     } catch (error) {
-      console.log('Error : ', error);
+      console.log('Error  : ', error);
     }
   };
 

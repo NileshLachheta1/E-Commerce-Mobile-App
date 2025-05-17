@@ -3,9 +3,9 @@ import { getUserProfiledata, userAddAllOrders, userAddNewAddressController, user
 const userRouter = express.Router();
 
 userRouter.post("/address",userAddNewAddressController);
-userRouter.get("/addresses/:userId",userGetAllAddresses);
+userRouter.get("/addresses/:token",userGetAllAddresses);
 userRouter.post("/orders",userAddAllOrders);
-userRouter.get("/profile/:userId",getUserProfiledata);
-userRouter.get("/orders/:userId",userGetAllOrderData);
+userRouter.get("/profile/:token",getUserProfiledata);
+userRouter.get("/orders/:token",userGetAllOrderData);
 
 export default userRouter;

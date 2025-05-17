@@ -13,6 +13,7 @@ import jwt_decode from 'jwt-decode';
 import {UserType} from '../UserContext.js';
 import axios from 'axios';
 import { useNavigation } from '@react-navigation/native';
+import { URLS } from '../utils/urls/index.js';
 
 const AddressScreen = () => {
   const [name, setName] = useState('');
@@ -22,23 +23,17 @@ const AddressScreen = () => {
   const [landmark, setLandmark] = useState('');
   const [postalCode, setPostalCode] = useState('');
   const {userId, setUserId} = useContext(UserType);
+  const [token,setToken] = useState('');
   const navigation = useNavigation();
 
   useEffect(() => {
     const fetchUser = async() => {
       const token = await AsyncStorage.getItem('authToken');
-      var payload = JSON.parse(window.atob(token.split('.')[1])); 
-      const decodedToken = jwt_decode(token,{body:true});
-      // const userId = decodedToken.userId;
-      setUserId("65f7e36e92127dee17308a7d");
-      // setUserId(userId);
-      console.log("========================================================")
-      console.log(">>>>>>>> :  ",decodedToken)
-      // console.log("========================================================")
+      setToken(token);
     };
     fetchUser();
   }, []);
-  console.log(">>>>>>>   ",userId);
+  // console.log(">>>>>>>   ",token);
 
   const handleAddAddress = async() => {
 
@@ -51,7 +46,7 @@ const AddressScreen = () => {
         landmark,
         postalCode
     }
-    axios.post("http://192.168.1.16:8000/user/address",{userId,address}).then(()=>{
+    axios.post(`${URLS.BASE_URL}user/address`,{token,address}).then(()=>{
         Alert.alert("Success","Address Added Successfully");
         setName("");
         setMobileNo("");

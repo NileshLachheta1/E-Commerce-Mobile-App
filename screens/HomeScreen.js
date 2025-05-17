@@ -26,6 +26,8 @@ import {useNavigation} from '@react-navigation/native';
 import {useSelector} from 'react-redux';
 import Modal, {ModalContent} from 'react-native-modal';
 import {UserContext, UserType} from '../UserContext.js';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { URLS } from '../utils/urls/index.js';
 
 export const HomeScreen = () => {
   const list = [
@@ -213,6 +215,7 @@ export const HomeScreen = () => {
       try {
         const response = await axios.get(`https://fakestoreapi.com/products`);
         setProducts(response.data);
+        // console.log("response : ",response.data)
       } catch (error) {
         console.log('error message_++++++', error);
       }
@@ -227,26 +230,34 @@ export const HomeScreen = () => {
   const cart = useSelector(state => state.cart.cart);
   const [modalVisible, setModalVisible] = useState(false);
   const [addresses, setAddresses] = useState([]);
-  const {userId, setUserId} = useContext(UserType);
-  const [selectedAddress,setSelectedAddress] = useState("");
-  setUserId('65f7e36e92127dee17308a7d');
-  useEffect(() => {
-    if (userId) {
-      fetchAddresses();
-    }
-  }, [userId, modalVisible]);
+  const [selectedAddress, setSelectedAddress] = useState('');
+  const [token, setToken] = useState('');
 
-  const fetchAddresses = async () => {
-    try {
-      const response = await axios.get(
-        `http://192.168.1.16:8000/user/addresses/65f7e36e92127dee17308a7d`,
-      );
-      const addresses = response.data.addresses;
-      setAddresses(addresses);
-    } catch (error) {
-      console.log('---------------------', error);
+
+  useEffect(() => {
+    const getTokenData = async ()=>{
+      const tokendata = await AsyncStorage.getItem('authToken');
+      // console.log("tokendata : ",tokendata)
+      setToken(tokendata);
+
+      try {
+        console.log("token : ",tokendata)
+        const response = await axios.get(
+          `${URLS.BASE_URL}user/addresses/${tokendata}`,
+        );
+        const addresses = response.data.addresses;
+        // console.log("response : ",addresses)
+        setAddresses(addresses);
+      } catch (error) {
+        console.log('Error While fetching the address data : ', error);
+      }
+
     }
-  };
+
+    getTokenData();
+  }, [modalVisible]);
+
+
   return (
     <>
       <SafeAreaView
@@ -291,9 +302,9 @@ export const HomeScreen = () => {
           </View>
 
           <Pressable
-          onPress={() => {
-            setModalVisible(true);
-          }}
+            onPress={() => {
+              setModalVisible(true);
+            }}
             style={{
               flexDirection: 'row',
               alignItems: 'center',
@@ -309,12 +320,14 @@ export const HomeScreen = () => {
             />
 
             <Pressable>
-              {selectedAddress?(
-                <Text style={{color:"black", fontSize:13, fontWeight:"500"}}>
+              {selectedAddress ? (
+                <Text style={{color: 'black', fontSize: 13, fontWeight: '500'}}>
                   Deliver to {selectedAddress.name} - {selectedAddress.street}
                 </Text>
-              ):(
-                <Text style={{color:"black", fontSize:13, fontWeight:"500"}}>Add an Address</Text>
+              ) : (
+                <Text style={{color: 'black', fontSize: 13, fontWeight: '500'}}>
+                  Add an Address
+                </Text>
               )}
             </Pressable>
             <MaterialIcons
@@ -569,7 +582,9 @@ export const HomeScreen = () => {
             {addresses.map((item, index) => {
               return (
                 <Pressable
-                onPress={()=>{setSelectedAddress(item)}}
+                  onPress={() => {
+                    setSelectedAddress(item);
+                  }}
                   style={{
                     width: 140,
                     height: 140,
@@ -581,7 +596,8 @@ export const HomeScreen = () => {
                     gap: 3,
                     marginTop: 10,
                     margin: 5,
-                    backgroundColor:selectedAddress === item ? "#FBCEB1" : "white"
+                    backgroundColor:
+                      selectedAddress === item ? '#FBCEB1' : 'white',
                   }}>
                   <View
                     style={{

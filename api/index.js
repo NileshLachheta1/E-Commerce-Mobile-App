@@ -11,8 +11,8 @@ app.use(cors());
 app.use(bodyparser.urlencoded({extended: false}));
 app.use(bodyparser.json());
 // app.use(connection());
-app.use("/", indexrouter);
-app.use('/user',userRouter);
+app.use("/api/", indexrouter);
+app.use('/api/user',userRouter);
 
 
 

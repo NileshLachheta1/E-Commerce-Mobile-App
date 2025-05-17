@@ -14,20 +14,21 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {useFocusEffect, useNavigation} from '@react-navigation/native';
 import axios from 'axios';
 import {UserType} from '../UserContext';
+import { URLS } from '../utils/urls';
 const AddAddressScreen = () => {
   const navigation = useNavigation();
   const [addresses, setAddresses] = useState([]);
-  const {userId, setUserId} = useContext(UserType);
-  // setUserId("65f7e36e92127dee17308a7d");
-  console.log('userId', userId);
-  useEffect(() => {
+  const [token,setToken] = useState('');
+  useEffect(async() => {
+   await AsyncStorage.getItem('authToken');
+    setToken(token);
     fetchAddresses();
   }, []);
 
   const fetchAddresses = async () => {
     try {
       const response = await axios.get(
-        `http://192.168.1.16:8000/user/addresses/65f7e36e92127dee17308a7d`,
+        `${URLS.BASE_URL}user/addresses/${token}`,
       );
       const addresses = response.data.addresses;
       setAddresses(addresses);

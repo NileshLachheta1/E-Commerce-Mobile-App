@@ -25,18 +25,19 @@ const RegisterScreen = () => {
       email: email,
       password: password,
     };
-    console.warn(user);
+    console.warn("Registration_Data ==> ",user);
 
     // send a post request to the backend api
 
     axios
-      .post('http://192.168.1.16:8000/register', user)
+      .post(`${URLS.BASE_URL}register`, user)
       .then(response => {
         console.log(response);
-        Alert.alert(
-          'Registration Successful',
-          'You have Registered Successfully',
-        );
+        // Alert.alert(
+        //   'Registration Successful',
+        //   'You have Registered Successfully',
+        // );
+        Alert.alert('Registration Successful', response.data.message);
         setName('');
         setEmail('');
         setPassword('');

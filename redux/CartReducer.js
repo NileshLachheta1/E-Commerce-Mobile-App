@@ -101,7 +101,7 @@ export default CartSlice.reducer
 //         itemPresent.quantity--;
 //       }
 //     },
-    
+
 //     cleanCart: state => {
 //       state.cart = [];
 //     },

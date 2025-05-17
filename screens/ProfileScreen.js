@@ -6,16 +6,17 @@ import {
   ScrollView,
   Pressable,
 } from 'react-native';
-import React, {useEffect, useLayoutEffect, useState} from 'react';
-import {useNavigation} from '@react-navigation/native';
+import React, { useEffect, useLayoutEffect, useState } from 'react';
+import { useNavigation } from '@react-navigation/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import logo from '../assets/logo.png';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { URLS } from '../utils/urls';
 const ProfileScreen = () => {
   const navigation = useNavigation();
-  const [orders,setOrders] = useState([]);
+  const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -25,7 +26,7 @@ const ProfileScreen = () => {
       },
       headerLeft: () => (
         <Image
-          style={{width: 180, height: 120, resizeMode: 'contain'}}
+          style={{ width: 180, height: 120, resizeMode: 'contain' }}
           source={logo}
         />
       ),
@@ -45,19 +46,36 @@ const ProfileScreen = () => {
   }, []);
 
   const [user, setUser] = useState();
+  // const [token, setToken] = useState('');
   useEffect(() => {
-    const fetchUserProfile = async () => {
+    const getTokenData = async () => {
       try {
+        const token = await AsyncStorage.getItem('authToken');
+        // setToken(token);
+
+        console.log("token value : ", token)
+
+        //  Fetch user Details
         const response = await axios.get(
-          'http://192.168.1.16:8000/user/profile/65f7e36e92127dee17308a7d',
+          `${URLS.BASE_URL}user/profile/${token}`,
         );
-        const {user} = response.data;
+        const { user } = response.data;
         setUser(user);
+        console.log("user : ", response)
+
+        //  Fetch User Order Data
+        const responseOrderdata = await axios.get(`${URLS.BASE_URL}user/orders/${token}`);
+        const order = responseOrderdata.data.orders;
+
+        console.log("orders : ", responseOrderdata)
+        setOrders(order);
+        setLoading(false);
       } catch (error) {
-        console.log('Error : ', error);
+        console.log('Error=============== : ', error);
       }
-    };
-    fetchUserProfile();
+    }
+    getTokenData();
+
   }, []);
   const logout = () => {
     clearAutoToken();
@@ -68,24 +86,10 @@ const ProfileScreen = () => {
     navigation.replace('Login');
   };
 
-  useEffect(()=>{
-    const fetchOrders = async()=>{
-      try {
-        const response = await axios.get("http://192.168.1.16:8000/user/orders/65f7e36e92127dee17308a7d");
-        const order = response.data.orders;
-        setOrders(order);
-
-        setLoading(false);
-      } catch (error) {
-        console.log(error);
-      }
-    }
-    fetchOrders();
-  },[])
-  console.log("orders :  ",orders);
+  // console.log("orders :  ", orders);
   return (
-    <ScrollView style={{padding: 10, flex: 1, backgroundColor: 'white'}}>
-      <Text style={{fontSize: 16, fontWeight: 'bold'}}>
+    <ScrollView style={{ padding: 10, flex: 1, backgroundColor: 'white' }}>
+      <Text style={{ fontSize: 16, fontWeight: 'bold' }}>
         {/* Welcome {user.name} */}
       </Text>
 
@@ -103,7 +107,7 @@ const ProfileScreen = () => {
             borderRadius: 25,
             flex: 1,
           }}>
-          <Text style={{textAlign: 'center', color:"black",fontWeight:"500"}}>Your Orders</Text>
+          <Text style={{ textAlign: 'center', color: "black", fontWeight: "500" }}>Your Orders</Text>
         </Pressable>
 
         <Pressable
@@ -113,7 +117,7 @@ const ProfileScreen = () => {
             borderRadius: 25,
             flex: 1,
           }}>
-          <Text style={{textAlign: 'center', color:"black",fontWeight:"500"}}>Your Account</Text>
+          <Text style={{ textAlign: 'center', color: "black", fontWeight: "500" }}>Your Account</Text>
         </Pressable>
       </View>
 
@@ -131,7 +135,7 @@ const ProfileScreen = () => {
             borderRadius: 25,
             flex: 1,
           }}>
-          <Text style={{textAlign: 'center', color:"black",fontWeight:"500"}}>Buy Again</Text>
+          <Text style={{ textAlign: 'center', color: "black", fontWeight: "500" }}>Buy Again</Text>
         </Pressable>
 
         <Pressable
@@ -142,13 +146,13 @@ const ProfileScreen = () => {
             borderRadius: 25,
             flex: 1,
           }}>
-          <Text style={{textAlign: 'center', color:"black",fontWeight:"500"}}>Logout</Text>
+          <Text style={{ textAlign: 'center', color: "black", fontWeight: "500" }}>Logout</Text>
         </Pressable>
       </View>
 
       <ScrollView horizontal showsHorizontalScrollIndicator={false}>
         {loading ? (
-          <Text style={{fontSize: 16, fontWeight: '500', color:"black", marginVertical:10}}>Loading...</Text>
+          <Text style={{ fontSize: 16, fontWeight: '500', color: "black", marginVertical: 10 }}>Loading...</Text>
         ) : orders.length > 0 ? (
           orders.map((order) => (
             <Pressable
